@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Personal Habit Tracker — Minimal Material</title>
+<style>
+:root{
+  --bg:#000000;
+  --surface:#000000;
+  --card:#000000;
+  --primary:#00FFC6;
+  --primary-2:#7C4DFF;
+  --accent:#FFD300;
+  --text:#E6FBFF;
+  --muted:#A6F0EA;
+  --danger:#FF6B6B;
+  --glass:transparent;
+  --border:rgba(255,255,255,0.26);
+  --row-sep:rgba(255,255,255,0.06);
+  --glow:rgba(0,255,198,0.12);
+  --radius:12px;
+  --cell:46px;
+  font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+*,*::before,*::after{box-sizing:border-box}
+.shell{max-width:980px;margin:12px auto;padding:14px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--primary-2),var(--primary));display:flex;align-items:center;justify-content:center;color:#001;font-weight:800;font-size:18px}
+h1{margin:0;font-size:18px}
+.subtitle{margin:0;color:var(--muted);font-size:13px}
+.card{background:var(--surface);border-radius:var(--radius);padding:12px;border:1px solid var(--border);box-shadow:0 0 28px rgba(0,255,198,0.04)}
+.setup{display:grid;gap:10px;grid-template-columns:1fr;align-items:end}
+label.small{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+input[type=date], input[type=number]{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text);font-weight:700}
+input::placeholder{color:var(--muted);opacity:1}
+.row{display:flex;gap:8px}
+.controls{display:flex;gap:8px;align-items:center}
+button{background:transparent;border:1px solid var(--border);padding:10px 14px;border-radius:12px;color:var(--text);font-weight:700;transition:transform .12s ease, box-shadow .12s ease}
+button.primary{background:linear-gradient(90deg,var(--primary),var(--primary-2));color:#001;border:none;box-shadow:0 10px 30px rgba(124,77,255,0.08)}
+button.primary:hover{transform:translateY(-3px);box-shadow:0 18px 48px rgba(124,77,255,0.12)}
+button.primary:active{transform:translateY(-1px) scale(0.99)}
+button:hover{box-shadow:0 8px 28px rgba(0,0,0,0.18)}
+button:active{transform:scale(0.99)}
+button.ghost{background:transparent}
+.topbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.status-card{display:flex;gap:12px;align-items:center}
+.progress{width:260px;display:flex;gap:12px;align-items:center}
+.progress .label{font-size:12px;color:var(--muted)}
+.progress-bar{flex:1;height:12px;border-radius:999px;background:rgba(255,255,255,0.04);overflow:hidden}
+.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .4s ease}
+.meta{font-size:13px;color:var(--muted)}
+.table-wrap{overflow:auto;border-radius:12px;border:1px solid var(--border);margin-top:6px}
+table{width:100%;border-collapse:collapse;min-width:860px}
+thead th{position:sticky;top:0;background:transparent;padding:12px 10px;font-size:13px;border-bottom:1px solid var(--row-sep);text-align:center}
+thead th.left{position:sticky;left:0;text-align:left;padding-left:18px;z-index:4}
+tbody td{padding:16px 12px;border-bottom:1px solid var(--row-sep);text-align:center}
+tbody td.left{position:sticky;left:0;background:transparent;text-align:left;padding-left:18px;z-index:3}
+.day-title{font-weight:800}
+.date-sub{color:var(--muted);font-size:12px}
+.cell{width:var(--cell);height:var(--cell);display:inline-grid;place-items:center;border-radius:10px;transition:transform .12s ease}
+input[type=checkbox]{appearance:none;width:28px;height:28px;border-radius:8px;display:inline-block;position:relative;border:2px solid rgba(255,255,255,0.26);background:transparent;cursor:pointer;transition:all .12s ease, box-shadow .18s ease}
+input[type=checkbox]:hover{border-color:rgba(255,255,255,0.34);box-shadow:0 8px 26px var(--glow)}
+input[type=checkbox]:focus{outline:none;box-shadow:0 10px 36px var(--glow)}
+input[type=checkbox]:checked{background:linear-gradient(90deg,var(--primary),var(--primary-2));border:2px solid rgba(0,0,0,0.08);transform:scale(1.02)}
+input[type=checkbox]:checked::after{content:'✓';position:absolute;left:6px;top:1px;color:#001;font-weight:900}
+.cell:active{transform:scale(0.98)}
+.rest{opacity:0.6;color:var(--muted);font-size:13px;line-height:46px}
+input[type=number].weight{width:96px;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.18);background:transparent;color:var(--text);font-weight:700;text-align:center}
+.motivate{font-size:13px;color:var(--muted);margin-top:8px;margin-bottom:6px}
+.footer-actions{display:flex;gap:12px;align-items:center;margin-top:8px}
+.confetti{pointer-events:none;position:fixed;left:50%;top:20%;transform:translateX(-50%);z-index:999;display:none}
+.confetti.show{display:block}
+.confetti span{display:inline-block;width:8px;height:12px;margin:2px;background:var(--primary);opacity:0.95;border-radius:2px;animation:fall .9s linear}
+@keyframes fall{0%{transform:translateY(-10px) rotate(0)}100%{transform:translateY(90px) rotate(360deg);opacity:0}}
+@media (max-width:560px){.logo{width:48px;height:48px}.shell{padding:10px}table{min-width:720px}.progress{width:140px}input[type=number].weight{width:78px}}
+</style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><div class="logo">90</div>
+        <div>
+          <h1>Personal Habit Tracker</h1>
+          <p class="subtitle">Minimal · Material · Focused on momentum</p>
+        </div>
+      </div>
+    </header>
+
+    <div id="setupCard" class="card setup">
+      <div>
+        <label class="small">Choose start date</label>
+        <input id="startDate" type="date" aria-label="Start date" placeholder="dd-mm-yyyy" />
+      </div>
+      <div>
+        <label class="small">Number of days</label>
+        <input id="daysCount" type="number" min="7" max="365" value="90" />
+      </div>
+      <div class="row">
+        <button id="applyBtn" class="primary">Start Tracker</button>
+        <button id="loadBtn" class="ghost">Load last</button>
+        <div style="flex:1"></div>
+      </div>
+      <p class="motivate">Start small. Track daily wins. Momentum compounds — this space will gently nudge you to keep going.</p>
+    </div>
+
+    <div id="trackerUI" style="display:none">
+      <div class="topbar">
+        <div class="status-card card" style="display:flex;align-items:center;gap:12px">
+          <div style="min-width:88px;text-align:left">
+            <div style="font-size:12px;color:var(--muted)">Progress</div>
+            <div style="font-weight:900;font-size:18px" id="pct">0%</div>
+          </div>
+          <div class="progress">
+            <div class="label"> <strong id="done">0</strong></div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+            <div class="label" style="text-align:right"> <span id="total">/0</span></div>
+          </div>
+          
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="display:flex;flex-direction:column"><label class="small">Tracker</label><div id="trackerLabel" class="small" style="color:var(--muted)"></div></div>
+          <div style="width:8px"></div>
+          <div class="footer-actions">
+            <button id="exportBtn">Export</button>
+            <button id="importBtn">Import</button>
+            <input id="importFile" type="file" accept=".json" style="display:none" />
+            <button id="resetBtn">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap card">
+        <table id="trackerTable" aria-label="habit table">
+          <thead>
+            <tr>
+              <th class="left">Day</th>
+              <th title="Wake 6AM">Wake 6AM</th>
+              <th title="Gym">Gym</th>
+              <th title="10k steps">10k Steps</th>
+              <th title="2L water">2L Water</th>
+              <th title="No Sugar">No Sugar</th>
+              <th title="No Junk">No Junk</th>
+              <th title="8h Sleep">8h Sleep</th>
+              <th title="Weight on Sundays">Weight</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <p class="motivate">Tip: celebrate small streaks. 3 days → 7 days are meaningful wins. Keep the streak alive.</p>
+    </div>
+
+    
+  </div>
+<script>
+(() => {
+  const TRACKERS = [{key:'wake6'},{key:'gym'},{key:'steps'},{key:'water'},{key:'nosugar'},{key:'nojunk'},{key:'sleep'}];
+  const setupCard = document.getElementById('setupCard');
+  const trackerUI = document.getElementById('trackerUI');
+  const startDateInput = document.getElementById('startDate');
+  const daysInput = document.getElementById('daysCount');
+  const applyBtn = document.getElementById('applyBtn');
+  const loadBtn = document.getElementById('loadBtn');
+  const tableBody = document.getElementById('tableBody');
+  const progressFill = document.getElementById('progressFill');
+  const pct = document.getElementById('pct');
+  const doneEl = document.getElementById('done');
+  const totalEl = document.getElementById('total');
+  const trackerLabel = document.getElementById('trackerLabel');
+  const exportBtn = document.getElementById('exportBtn');
+  const importBtn = document.getElementById('importBtn');
+  const importFile = document.getElementById('importFile');
+  const resetBtn = document.getElementById('resetBtn');
+  const confetti = document.getElementById('confetti');
+
+  let startIso = null;
+  let days = 90;
+  let STORAGE_KEY = null;
+  let state = {start:null, days:{}};
+  
+
+  function keyFor(s,d){return `tracker::${s}::${d}`}
+
+  applyBtn.addEventListener('click', () => {
+    const s = startDateInput.value;
+    const d = parseInt(daysInput.value,10) || 90;
+    if(!s){alert('Please choose a start date'); return}
+    if(d<7||d>365){alert('Days must be between 7 and 365');return}
+    startIso = s; days = d; STORAGE_KEY = keyFor(startIso, days);
+    trackerLabel.textContent = `${new Date(startIso).toLocaleDateString()} · ${days} days`;
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ if(!confirm('A saved tracker for this start date & length exists. Load it?')) return; state = JSON.parse(raw); }
+    else { state = {start:startIso, days:{}}; localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    setupCard.style.display = 'none'; trackerUI.style.display = '';
+    renderTable(); computeProgress();
+  });
+
+  loadBtn.addEventListener('click', ()=>{
+    const prefix = 'tracker::'; let lastKey = null;
+    for(let i=0;i<localStorage.length;i++){ const k = localStorage.key(i); if(k && k.startsWith(prefix)) lastKey=k; }
+    if(!lastKey){alert('No saved trackers found in this browser.');return}
+    const parts = lastKey.split('::');
+    if(parts.length>=3){ startDateInput.value = parts[1]; daysInput.value = parts[2]; alert('Loaded last used start & days into form. Press Start Tracker to open it.'); }
+    else alert('Could not parse saved tracker key.');
+  });
+
+  function renderTable(){
+    tableBody.innerHTML = '';
+    const start = new Date(startIso + 'T00:00:00');
+    for(let i=0;i<days;i++){
+      const dayIndex = i+1;
+      const date = new Date(start); date.setDate(start.getDate()+i);
+      const weekday = date.toLocaleDateString(undefined,{weekday:'short'});
+      const dateLabel = date.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+      const isSunday = date.getDay()===0;
+      if(!state.days[dayIndex]) state.days[dayIndex] = {checked:{}, weight:null};
+      const tr = document.createElement('tr');
+      const left = document.createElement('td'); left.className='left';
+      left.innerHTML = `<div class="day-title">Day ${dayIndex}</div><div class="date-sub">${weekday} · ${dateLabel}</div>`;
+      tr.appendChild(left);
+
+      TRACKERS.forEach(t=>{
+        const td = document.createElement('td');
+        const isRest = isSunday && (t.key==='gym' || t.key==='steps');
+        if(isRest){ td.innerHTML = '<div class="rest">Rest</div>'; }
+        else{
+          const id = `d${dayIndex}-${t.key}`;
+          const wrap = document.createElement('div'); wrap.className='cell';
+          const cb = document.createElement('input'); cb.type='checkbox'; cb.id=id;
+          cb.dataset.day=dayIndex; cb.dataset.key=t.key;
+          cb.checked = !!(state.days[dayIndex] && state.days[dayIndex].checked && state.days[dayIndex].checked[t.key]);
+          cb.addEventListener('change', onToggle);
+          wrap.appendChild(cb); td.appendChild(wrap);
+        }
+        tr.appendChild(td);
+      });
+
+      const wt = document.createElement('td');
+      if(isSunday){
+        const input = document.createElement('input'); input.type='number'; input.className='weight'; input.min=20; input.step='0.1';
+        input.value = state.days[dayIndex] && state.days[dayIndex].weight != null ? state.days[dayIndex].weight : '';
+        input.dataset.day = dayIndex;
+        input.addEventListener('change', (e)=>{ const d=e.target.dataset.day; const v=e.target.value.trim(); state.days[d].weight = v===''?null:Number(v); save(); });
+        wt.appendChild(input);
+      } else { wt.innerHTML = '<div class="rest">—</div>'; }
+      tr.appendChild(wt);
+
+      tableBody.appendChild(tr);
+    }
+    save();
+  }
+
+  function onToggle(e){ const day=e.target.dataset.day; const key=e.target.dataset.key; const val=e.target.checked; if(!state.days[day]) state.days[day]={checked:{},weight:null}; state.days[day].checked[key]=val; save(); computeProgress();  }
+
+  function save(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){console.warn('save',e);} }
+
+  function computeProgress(){
+    let total=0, done=0;
+    const s=new Date(startIso+'T00:00:00');
+    for(let i=0;i<days;i++){
+      const dayIndex=i+1; const date=new Date(s); date.setDate(s.getDate()+i); const isSunday=date.getDay()===0;
+      TRACKERS.forEach(t=>{ const disabled = isSunday && (t.key==='gym'||t.key==='steps'); if(!disabled){ total++; if(state.days[dayIndex] && state.days[dayIndex].checked && state.days[dayIndex].checked[t.key]) done++; } })
+    }
+    const pctv = total? Math.round((done/total)*100):0; progressFill.style.width = pctv+'%'; pct.textContent = pctv+'%'; doneEl.textContent = done; totalEl.textContent = '/'+total; }
+
+  exportBtn.addEventListener('click', ()=>{ try{ const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`tracker-${startIso}-${days}d.json`; a.click(); URL.revokeObjectURL(url); }catch(e){alert('Export failed');} });
+  importBtn.addEventListener('click', ()=>importFile.click());
+  importFile.addEventListener('change', (ev)=>{ const f=ev.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=(e)=>{ try{ const imported=JSON.parse(e.target.result); if(imported && imported.days){ if(confirm('Import will overwrite current tracker data. Continue?')){ state=imported; save(); renderTable(); computeProgress(); } } else alert('Invalid file'); }catch(err){alert('Parse error'); } }; r.readAsText(f); importFile.value=''; });
+  resetBtn.addEventListener('click', ()=>{ if(confirm('Reset current tracker? This cannot be undone.')){ state={start:startIso, days:{}}; save(); renderTable(); computeProgress(); } });
+  (function tryPrefill(){ const prefix='tracker::'; let last=null; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k && k.startsWith(prefix)) last=k; } if(last){ const parts=last.split('::'); if(parts.length>=3){ startDateInput.value = parts[1]; daysInput.value = parts[2]; } } })();
+})();
+</script>
+</body>
+</html>
